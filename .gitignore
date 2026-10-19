@@ -1,0 +1,30 @@
+# Java / Spring Boot
+**/target/
+*.class
+*.log
+
+# Angular / Node.js
+**/node_modules/
+**/dist/
+**/.angular/
+**/coverage/
+
+# Python
+**/__pycache__/
+**/.venv/
+*.pyc
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Operating system
+.DS_Store

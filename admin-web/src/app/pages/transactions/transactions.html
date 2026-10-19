@@ -1,0 +1,138 @@
+
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>SmartToll Transactions</h1>
+      <p>Unified toll and payment monitoring</p>
+    </div>
+
+    <button
+      type="button"
+      (click)="refresh()"
+      [disabled]="loading()">
+      {{ loading() ? 'Refreshing...' : 'Refresh' }}
+    </button>
+  </header>
+
+  <section class="stats">
+    <div class="card">
+      <h3>Total Toll Transactions</h3>
+      <strong>{{ totalTransactions() }}</strong>
+    </div>
+
+    <div class="card">
+      <h3>Authorized Toll Charges</h3>
+      <strong>¥{{ authorizedCharges() | number:'1.0-0' }}</strong>
+    </div>
+
+    <div class="card">
+      <h3>Confirmed Payments</h3>
+      <strong>¥{{ confirmedRevenue() | number:'1.0-0' }}</strong>
+    </div>
+
+    <div class="card">
+      <h3>Cash Revenue</h3>
+      <strong>¥{{ cashRevenue() | number:'1.0-0' }}</strong>
+    </div>
+
+    <div class="card">
+      <h3>RFID/Card Revenue</h3>
+      <strong>¥{{ cardRevenue() | number:'1.0-0' }}</strong>
+    </div>
+  </section>
+
+  <p class="note">
+    Figures summarize records returned by the APIs.
+    Confirmed payments exclude legacy transactions without
+    a matching payment record.
+  </p>
+
+  <section class="filters">
+    <input
+      type="text"
+      placeholder="Search plate, transaction ID or lane"
+      [ngModel]="searchText()"
+      (ngModelChange)="searchText.set($event)"
+    />
+
+    <select
+      [ngModel]="methodFilter()"
+      (ngModelChange)="methodFilter.set($event)">
+      <option value="ALL">All payment methods</option>
+      <option value="CASH">Cash</option>
+      <option value="RFID_CARD">RFID/Card</option>
+      <option value="WALLET">Wallet</option>
+      <option value="LEGACY / UNKNOWN">Legacy / Unknown</option>
+    </select>
+
+    <select
+      [ngModel]="statusFilter()"
+      (ngModelChange)="statusFilter.set($event)">
+      <option value="ALL">All payment statuses</option>
+      <option value="PAID">Paid</option>
+      <option value="PENDING">Pending</option>
+      <option value="DECLINED">Declined</option>
+      <option value="NOT RECORDED">Not recorded</option>
+    </select>
+  </section>
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p>Loading transaction records...</p>
+  } @else {
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Transaction</th>
+            <th>Vehicle</th>
+            <th>Lane</th>
+            <th>Payment Method</th>
+            <th>Amount</th>
+            <th>Toll Status</th>
+            <th>Payment Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @for (tx of filteredRows(); track tx.id) {
+            <tr>
+              <td>#{{ tx.id }}</td>
+              <td>{{ tx.plate }}</td>
+              <td>{{ tx.laneCode }}</td>
+              <td>{{ tx.paymentMethod }}</td>
+              <td>¥{{ tx.amount | number:'1.0-0' }}</td>
+              <td>
+                <span class="status toll-status">
+                  {{ tx.status }}
+                </span>
+              </td>
+              <td>
+                <span
+                  class="status"
+                  [class.paid]="tx.paymentStatus === 'PAID'"
+                  [class.unrecorded]="tx.paymentStatus === 'NOT RECORDED'">
+                  {{ tx.paymentStatus }}
+                </span>
+              </td>
+              <td>{{ tx.created_at | date:'medium' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="8">No matching transactions.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="results">
+      Showing {{ filteredRows().length }} of
+      {{ totalTransactions() }} returned transactions
+    </p>
+  }
+</div>

@@ -1,0 +1,48 @@
+<div class="gate-panel">
+
+  <div class="gate-header">
+    <h2>Lane {{ laneCode }}</h2>
+
+    <span
+      class="gate-badge"
+      [class.open]="gateState === 'OPEN'"
+      [class.closed]="gateState === 'CLOSED'"
+    >
+      Actual: {{ gateState }}
+    </span>
+  </div>
+
+  <div class="road">
+
+    <div class="road-line"></div>
+
+    <div class="vehicle">
+      <div class="windshield"></div>
+      <div class="headlights"></div>
+    </div>
+
+    <div class="barrier-base">
+
+      <div
+        class="barrier-arm"
+        [class.raised]="visualState() === 'OPEN'"
+      ></div>
+
+    </div>
+
+    <div
+      class="traffic-light"
+      [class.green]="visualState() === 'OPEN'"
+      [class.red]="visualState() === 'CLOSED'"
+    >
+      {{ visualState() === 'OPEN' ? 'GO' : 'STOP' }}
+    </div>
+
+  </div>
+
+  <div class="gate-footer">
+    <span>Animation: {{ visualState() }}</span>
+    <span>Backend: {{ gateState }}</span>
+  </div>
+
+</div>

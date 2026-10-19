@@ -1,0 +1,177 @@
+.page {
+  padding: 32px;
+  background: #f4f6f9;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.page-header,
+.lane-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-header h1 {
+  margin-bottom: 6px;
+}
+
+.page-header p,
+.lane-heading p {
+  color: #64748b;
+}
+
+.lane-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.lane-card,
+.event-history {
+  background: white;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.lane-heading h2 {
+  margin: 0;
+}
+
+.status {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.open {
+  background: #d4edda;
+  color: #155724;
+}
+
+.closed {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.payment-mode {
+  margin: 18px 0;
+}
+
+.payment-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 18px;
+  background: #f8fafc;
+  border-radius: 10px;
+}
+
+.payment-panel h3 {
+  margin: 0 0 6px;
+}
+
+.payment-panel label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.payment-panel input {
+  padding: 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+button {
+  padding: 11px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.complete-button {
+  width: 100%;
+  margin-top: 18px;
+  background: #334155;
+}
+
+.live-event,
+.feedback {
+  margin-top: 18px;
+  padding: 14px;
+  background: #e0f2fe;
+  border-radius: 8px;
+}
+
+.error {
+  color: #c62828;
+  margin-top: 12px;
+}
+
+.event-history {
+  margin-top: 32px;
+  overflow-x: auto;
+}
+
+.event-history table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.event-history th,
+.event-history td {
+  padding: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 16px;
+  }
+
+  .lane-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.revenue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.revenue-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: white;
+  border-radius: 12px;
+  padding: 22px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+.revenue-card span {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.revenue-card strong {
+  color: #0f172a;
+  font-size: 28px;
+}

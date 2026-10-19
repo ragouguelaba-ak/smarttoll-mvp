@@ -1,0 +1,9 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/smarttoll}
+    username: ${DB_USER:smarttoll}
+    password: ${DB_PASSWORD:smarttoll_dev}
+  flyway:
+    enabled: true

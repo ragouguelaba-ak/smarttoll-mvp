@@ -1,0 +1,11 @@
+CREATE TABLE vehicles (id BIGSERIAL PRIMARY KEY, plate_number VARCHAR(32) NOT NULL UNIQUE, category VARCHAR(20) NOT NULL CHECK(category IN ('CAR','TRUCK','BUS')), rfid_tag VARCHAR(64) UNIQUE);
+CREATE TABLE wallets (id BIGSERIAL PRIMARY KEY, vehicle_id BIGINT NOT NULL UNIQUE REFERENCES vehicles(id), balance NUMERIC(14,2) NOT NULL DEFAULT 0 CHECK(balance>=0));
+CREATE TABLE toll_stations (id BIGSERIAL PRIMARY KEY, name VARCHAR(100) NOT NULL, location VARCHAR(200));
+CREATE TABLE toll_lanes (id BIGSERIAL PRIMARY KEY, station_id BIGINT NOT NULL REFERENCES toll_stations(id), lane_code VARCHAR(30) NOT NULL, gate_state VARCHAR(20) NOT NULL DEFAULT 'CLOSED', UNIQUE(station_id,lane_code));
+CREATE TABLE toll_tariffs (id BIGSERIAL PRIMARY KEY, station_id BIGINT NOT NULL REFERENCES toll_stations(id), vehicle_category VARCHAR(20) NOT NULL, amount NUMERIC(14,2) NOT NULL CHECK(amount>=0), UNIQUE(station_id,vehicle_category));
+CREATE TABLE toll_transactions (id BIGSERIAL PRIMARY KEY, event_id UUID NOT NULL UNIQUE, vehicle_id BIGINT REFERENCES vehicles(id), lane_id BIGINT NOT NULL REFERENCES toll_lanes(id), amount NUMERIC(14,2), status VARCHAR(30) NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE wallet_ledger (id BIGSERIAL PRIMARY KEY, wallet_id BIGINT NOT NULL REFERENCES wallets(id), transaction_id BIGINT REFERENCES toll_transactions(id), amount NUMERIC(14,2) NOT NULL, type VARCHAR(20) NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+CREATE TABLE gate_events (id BIGSERIAL PRIMARY KEY, lane_id BIGINT NOT NULL REFERENCES toll_lanes(id), transaction_id BIGINT REFERENCES toll_transactions(id), event_type VARCHAR(30) NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT now());
+INSERT INTO toll_stations(id,name,location) VALUES (1,'Demo Station','Simulation');
+INSERT INTO toll_lanes(id,station_id,lane_code) VALUES (1,1,'L1');
+INSERT INTO toll_tariffs(station_id,vehicle_category,amount) VALUES (1,'CAR',500),(1,'TRUCK',1500),(1,'BUS',1000);
