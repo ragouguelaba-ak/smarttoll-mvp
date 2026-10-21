@@ -28,3 +28,12 @@
 
 # Operating system
 .DS_Store
+
+# Local Wokwi MQTT credentials
+iot-simulator/wokwi-esp32/secrets.h
+
+# Local Java source backups
+*.java.bak
+
+# Wokwi ESP32 local backups
+iot-simulator/wokwi-esp32/*.bak

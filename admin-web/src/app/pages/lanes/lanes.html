@@ -8,155 +8,154 @@
   </header>
 
   @if (lastEvent()) {
-    <p class="live-event">Latest gate event: {{ lastEvent() }}</p>
-  }
-
-  @if (error()) {
-    <p class="error">{{ error() }}</p>
+  <p class="live-event">Latest gate event: {{ lastEvent() }}</p>
+  } @if (error()) {
+  <p class="error">{{ error() }}</p>
   }
 
   <section class="revenue-grid">
-  <div class="revenue-card">
-    <span>Total revenue</span>
-    <strong>¥{{ totalRevenue() | number:'1.0-0' }}</strong>
-  </div>
+    <div class="revenue-card">
+      <span>Total revenue</span>
+      <strong>¥{{ totalRevenue() | number:'1.0-0' }}</strong>
+    </div>
 
-  <div class="revenue-card">
-    <span>Paid transactions</span>
-    <strong>{{ paidTransactions() }}</strong>
-  </div>
+    <div class="revenue-card">
+      <span>Paid transactions</span>
+      <strong>{{ paidTransactions() }}</strong>
+    </div>
 
-  <div class="revenue-card">
-    <span>Cash revenue</span>
-    <strong>¥{{ cashRevenue() | number:'1.0-0' }}</strong>
-  </div>
+    <div class="revenue-card">
+      <span>Cash revenue</span>
+      <strong>¥{{ cashRevenue() | number:'1.0-0' }}</strong>
+    </div>
 
-  <div class="revenue-card">
-    <span>RFID/Card revenue</span>
-    <strong>¥{{ cardRevenue() | number:'1.0-0' }}</strong>
-  </div>
-</section>
+    <div class="revenue-card">
+      <span>RFID/Card revenue</span>
+      <strong>¥{{ cardRevenue() | number:'1.0-0' }}</strong>
+    </div>
+  </section>
 
   <div class="lane-grid">
     @for (lane of lanes(); track lane.id) {
-      <article class="lane-card">
-        <div class="lane-heading">
-          <div>
-            <h2>{{ lane.lane_code }}</h2>
-            <p>Station {{ lane.station_id }}</p>
-          </div>
-
-          <span
-            class="status"
-            [class.open]="lane.gate_state === 'OPEN'"
-            [class.closed]="lane.gate_state === 'CLOSED'"
-          >
-            {{ lane.gate_state }}
-          </span>
+    <article class="lane-card">
+      <div class="lane-heading">
+        <div>
+          <h2>{{ lane.lane_code }}</h2>
+          <p>Station {{ lane.station_id }}</p>
         </div>
 
-        <p class="payment-mode">
-          Payment method:
-          <strong>{{ lane.payment_mode }}</strong>
-        </p>
+        <span
+          class="status"
+          [class.open]="lane.gate_state === 'OPEN'"
+          [class.closed]="lane.gate_state === 'CLOSED'"
+        >
+          {{ lane.gate_state }}
+        </span>
+      </div>
 
-        <app-gate-animation
-          [laneCode]="lane.lane_code"
-          [gateState]="lane.gate_state">
-        </app-gate-animation>
+      <p class="payment-mode">
+        Payment method:
+        <strong>{{ lane.payment_mode }}</strong>
+      </p>
 
-        @if (lane.payment_mode === 'CASH') {
-          <section class="payment-panel">
-            <h3>Cash collection</h3>
+      <app-gate-animation
+        [laneCode]="lane.lane_code"
+        [gateState]="lane.gate_state"
+      >
+      </app-gate-animation>
 
-            <label for="cash-plate">Vehicle plate</label>
-            <input
-              id="cash-plate"
-              type="text"
-              [value]="cashPlate()"
-              (input)="cashPlate.set($any($event.target).value)"
-              placeholder="OSAKA-3345"
-            />
+      @if (lane.payment_mode === 'CASH') {
+      <section class="payment-panel">
+        <h3>Cash collection</h3>
 
-            <button
-              type="button"
-              [disabled]="busy() || lane.gate_state !== 'CLOSED'"
-              (click)="createCashPassage(lane.id)"
-            >
-              Detect vehicle
-            </button>
-
-            @if (pendingCashTransactionId() !== null) {
-              <p>Transaction #{{ pendingCashTransactionId() }}</p>
-              <p>Toll fee: ¥{{ pendingCashFee() }}</p>
-
-              <label for="cash-received">Cash received (JPY)</label>
-              <input
-                id="cash-received"
-                type="number"
-                min="0"
-                step="1"
-                [value]="cashReceived()"
-                (input)="cashReceived.set(+$any($event.target).value)"
-              />
-
-              <button
-                type="button"
-                [disabled]="busy() || cashReceived() < pendingCashFee()"
-                (click)="confirmCash()"
-              >
-                Confirm payment
-              </button>
-            }
-          </section>
-        }
-
-        @if (lane.payment_mode === 'RFID_CARD') {
-          <section class="payment-panel">
-            <h3>RFID/Card simulation</h3>
-
-            <label for="rfid-tag">RFID tag</label>
-            <input
-              id="rfid-tag"
-              type="text"
-              [value]="rfidTag()"
-              (input)="rfidTag.set($any($event.target).value)"
-            />
-
-            <label for="observed-plate">ANPR observed plate</label>
-            <input
-              id="observed-plate"
-              type="text"
-              [value]="observedPlate()"
-              (input)="observedPlate.set($any($event.target).value)"
-            />
-
-            <button
-              type="button"
-              [disabled]="busy() || lane.gate_state !== 'CLOSED'"
-              (click)="simulateCard(lane.id)"
-            >
-              Simulate RFID passage
-            </button>
-          </section>
-        }
+        <label for="cash-plate">Vehicle plate</label>
+        <input
+          id="cash-plate"
+          type="text"
+          [value]="cashPlate()"
+          (input)="cashPlate.set($any($event.target).value)"
+          placeholder="OSAKA-3345"
+        />
 
         <button
           type="button"
-          class="complete-button"
-          [disabled]="busy() || lane.gate_state !== 'OPEN'"
-          (click)="completePassage(lane.id)"
+          [disabled]="busy() || lane.gate_state !== 'CLOSED'"
+          (click)="createCashPassage(lane.id)"
         >
-          Complete passage / Close barrier
+          Detect vehicle
         </button>
-      </article>
+
+        @if (pendingCashTransactionId() !== null) {
+        <p>Transaction #{{ pendingCashTransactionId() }}</p>
+        <p>Toll fee: ¥{{ pendingCashFee() }}</p>
+
+        <label for="cash-received">Cash received (JPY)</label>
+        <input
+          id="cash-received"
+          type="number"
+          min="0"
+          step="1"
+          [value]="cashReceived()"
+          (input)="cashReceived.set(+$any($event.target).value)"
+        />
+
+        <button
+          type="button"
+          [disabled]="busy() || cashReceived() < pendingCashFee()"
+          (click)="confirmCash()"
+        >
+          Confirm payment
+        </button>
+        }
+      </section>
+      } @if (lane.payment_mode === 'RFID_CARD') {
+      <section class="payment-panel">
+        <h3>RFID/Card simulation</h3>
+
+        <label for="rfid-tag">RFID tag</label>
+        <input
+          id="rfid-tag"
+          type="text"
+          [value]="rfidTag()"
+          (input)="rfidTag.set($any($event.target).value)"
+        />
+
+        <label for="observed-plate">ANPR observed plate</label>
+        <input
+          id="observed-plate"
+          type="text"
+          [value]="observedPlate()"
+          (input)="observedPlate.set($any($event.target).value)"
+        />
+
+        <button
+          type="button"
+          [disabled]="busy() || lane.gate_state !== 'CLOSED'"
+          (click)="simulateCard(lane.id)"
+        >
+          Simulate RFID passage
+        </button>
+      </section>
+      } @if (lane.payment_mode === 'CASH') {
+      <p class="feedback">Automatic gate closure enabled via MQTT simulator.</p>
+      } @else {
+      <button
+        type="button"
+        class="complete-button"
+        disabled
+        title="Manual completion requires a transaction ID and event ID"
+      >
+        Manual completion unavailable
+      </button>
+      }
+    </article>
     } @empty {
-      <p>No lanes available.</p>
+    <p>No lanes available.</p>
     }
   </div>
 
   @if (message()) {
-    <p class="feedback">{{ message() }}</p>
+  <p class="feedback">{{ message() }}</p>
   }
 
   <section class="event-history">
@@ -172,37 +171,37 @@
       </thead>
       <tbody>
         @for (event of gateHistory(); track $index) {
-          <tr>
-            <td>Lane {{ event.laneId }}</td>
-            <td>{{ event.state }}</td>
-            <td>{{ event.timestamp | date:'mediumTime' }}</td>
-          </tr>
+        <tr>
+          <td>Lane {{ event.laneId }}</td>
+          <td>{{ event.state }}</td>
+          <td>{{ event.timestamp | date:'mediumTime' }}</td>
+        </tr>
         } @empty {
-          <tr>
-            <td colspan="3">Waiting for gate events...</td>
-          </tr>
+        <tr>
+          <td colspan="3">Waiting for gate events...</td>
+        </tr>
         }
       </tbody>
     </table>
   </section>
 
   <section class="event-history">
-  <h2>Recent Payments</h2>
+    <h2>Recent Payments</h2>
 
-  <table>
-    <thead>
-      <tr>
-        <th>Transaction</th>
-        <th>Lane</th>
-        <th>Method</th>
-        <th>Amount</th>
-        <th>Status</th>
-        <th>Time</th>
-      </tr>
-    </thead>
+    <table>
+      <thead>
+        <tr>
+          <th>Transaction</th>
+          <th>Lane</th>
+          <th>Method</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Time</th>
+        </tr>
+      </thead>
 
-    <tbody>
-      @for (payment of payments(); track payment.id) {
+      <tbody>
+        @for (payment of payments(); track payment.id) {
         <tr>
           <td>#{{ payment.transaction_id }}</td>
           <td>L{{ payment.lane_id }}</td>
@@ -211,12 +210,12 @@
           <td>{{ payment.status }}</td>
           <td>{{ payment.created_at | date:'mediumTime' }}</td>
         </tr>
-      } @empty {
+        } @empty {
         <tr>
           <td colspan="6">No payments recorded yet.</td>
         </tr>
-      }
-    </tbody>
-  </table>
-</section>
+        }
+      </tbody>
+    </table>
+  </section>
 </div>

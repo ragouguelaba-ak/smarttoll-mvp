@@ -12,6 +12,9 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.util.UUID;
+import org.springframework.web.bind.annotation.RequestBody;
+
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:4200")
@@ -19,9 +22,12 @@ public class Api {
     private final JdbcTemplate db;
     private final GateEventStream gateEventStream;
 
-    public Api(JdbcTemplate db, GateEventStream gateEventStream) {
+    private VehicleCrossingService crossingService;
+
+    public Api(JdbcTemplate db, GateEventStream gateEventStream, VehicleCrossingService crossingService) {
         this.db = db;
         this.gateEventStream = gateEventStream;
+        this.crossingService = crossingService;
     }
 
     private void publishGateStateAfterCommit(long laneId, String state) {
@@ -147,34 +153,18 @@ public class Api {
     }
 
     @PostMapping("/lanes/{id}/complete")
-    @Transactional
-    public Map<String, String> complete(@PathVariable long id) {
+    public Map<String, Object> complete(
+            @PathVariable long id,
+            @RequestBody CrossingRequest request) {
 
-        var lane = db.queryForList(
-                "SELECT gate_state FROM toll_lanes WHERE id=? FOR UPDATE",
+        return crossingService.complete(
+                request.eventId(),
+                request.transactionId(),
                 id);
+    }
 
-        if (lane.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Lane not found");
-        }
-
-        if (!"OPEN".equals(lane.get(0).get("gate_state"))) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "Gate not open");
-        }
-
-        db.update(
-                "UPDATE toll_lanes SET gate_state='CLOSED' WHERE id=?",
-                id);
-
-        db.update(
-                "INSERT INTO gate_events(lane_id,event_type) " +
-                        "VALUES (?,'PASSAGE_COMPLETE')",
-                id);
-
-        publishGateStateAfterCommit(id, "CLOSED");
-
-        return Map.of("gateState", "CLOSED");
+    public record CrossingRequest(
+            UUID eventId,
+            long transactionId) {
     }
 }

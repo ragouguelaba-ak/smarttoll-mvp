@@ -7,6 +7,7 @@ import {
   ViewChildren,
   QueryList,
   computed,
+  ChangeDetectorRef
 } from "@angular/core";
 
 import { CommonModule } from "@angular/common";
@@ -42,6 +43,7 @@ interface GateHistoryEntry {
 export class Lanes implements OnInit, OnDestroy {
   private readonly api = inject(SmarttollService);
   private readonly events = inject(GateEventsService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   private subscription?: Subscription;
   private newEventId(): string {
@@ -249,16 +251,17 @@ export class Lanes implements OnInit, OnDestroy {
   }
 
   loadLanes(): void {
-    this.api.getLanes().subscribe({
-      next: (data: TollLane[]) => {
-        this.lanes.set(data);
-        this.error.set("");
-      },
-      error: (err: Error) => {
-        this.error.set(`Unable to load lanes: ${err.message}`);
-      },
-    });
-  }
+  this.api.getLanes().subscribe({
+    next: (data: TollLane[]) => {
+      this.lanes.set(data);
+      this.cdr.detectChanges();
+      this.error.set('');
+    },
+    error: (err: Error) => {
+      this.error.set(`Unable to load lanes: ${err.message}`);
+    },
+  });
+}
 
   ngOnDestroy(): void {
     this.subscription?.unsubscribe();

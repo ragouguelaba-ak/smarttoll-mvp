@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "author": "SmartToll",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "wokwi-esp32-devkit-v1",
+      "id": "esp",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "barrierLed",
+      "top": -30,
+      "left": 260,
+      "attrs": {
+        "color": "green"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": 50,
+      "left": 260,
+      "attrs": {
+        "value": "220"
+      }
+    },
+    {
+  "type": "wokwi-pushbutton",
+  "id": "rfidButton",
+  "top": 140,
+  "left": 260,
+  "attrs": {
+    "color": "blue",
+    "label": "RFID Scan"
+  }
+}
+  ],
+  "connections": [
+    ["esp:D2", "r1:1", "green", []],
+    ["r1:2", "barrierLed:A", "green", []],
+    ["barrierLed:C", "esp:GND.1", "black", []],
+    ["rfidButton:1.l", "esp:D4", "blue", []],
+    ["rfidButton:2.l", "esp:GND.1", "black", []]
+  ],
+  "dependencies": {}
+}

@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+
+import { Injectable, NgZone, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 export interface GateStatusEvent {
@@ -11,10 +12,10 @@ export interface GateStatusEvent {
   providedIn: 'root'
 })
 export class GateEventsService {
+  private readonly zone = inject(NgZone);
 
   watchGateEvents(): Observable<GateStatusEvent> {
     return new Observable<GateStatusEvent>(observer => {
-
       const source = new EventSource(
         'http://localhost:8080/api/gate-events'
       );
@@ -25,14 +26,18 @@ export class GateEventsService {
             (event as MessageEvent).data
           ) as GateStatusEvent;
 
-          observer.next(data);
+          this.zone.run(() => {
+            observer.next(data);
+          });
         } catch (error) {
           console.error('Invalid gate event:', error);
         }
       });
 
-      // EventSource reconnects automatically after temporary
-      // connection failures.
+      source.onerror = () => {
+        console.warn('Gate SSE connection interrupted; reconnecting...');
+      };
+
       return () => source.close();
     });
   }

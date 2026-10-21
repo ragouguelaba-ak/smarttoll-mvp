@@ -7,3 +7,9 @@ spring:
     password: ${DB_PASSWORD:smarttoll_dev}
   flyway:
     enabled: true
+
+smarttoll:
+  mqtt:
+    enabled: ${MQTT_ENABLED:true}
+    url: ${MQTT_URL:tcp://localhost:1883}
+    client-id: ${MQTT_CLIENT_ID:smarttoll-backend}
